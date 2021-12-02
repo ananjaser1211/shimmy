@@ -15,7 +15,7 @@
  */
 
 #define LOG_NDEBUG 1
-//#define LOG_PARAMETERS
+#define LOG_PARAMETERS
 
 #define LOG_TAG "Camera2Wrapper"
 #include <cutils/log.h>
@@ -96,8 +96,34 @@ static char * camera2_fixup_getparams(int id __unused, const char * settings) {
     //params.set("drc", "true");
     //params.set("phase-af", "on");
 
+    /* no one will ever know */
+
+    /* FPS Correction */
+    params.set(android::CameraParameters::KEY_PREVIEW_FPS_RANGE, "15000,30000");
+    params.set(android::CameraParameters::KEY_SUPPORTED_PREVIEW_FPS_RANGE, "(15000,30000)");
+
+    /* Exposure Correction */
+    static int minExposureCompensation = -4;
+    static int maxExposureCompensation = 4;
+    static float exposureCompensationStep = 0.5f;
+
+    params.set(android::CameraParameters::KEY_MIN_EXPOSURE_COMPENSATION, minExposureCompensation);
+    params.set(android::CameraParameters::KEY_MAX_EXPOSURE_COMPENSATION, maxExposureCompensation);
+    params.set(android::CameraParameters::KEY_EXPOSURE_COMPENSATION, 0);
+    params.setFloat(android::CameraParameters::KEY_EXPOSURE_COMPENSATION_STEP, exposureCompensationStep);
+
+    /* Zoom correction */
+    params.set(android::CameraParameters::KEY_ZOOM_SUPPORTED, "false");
+    params.set(android::CameraParameters::KEY_SMOOTH_ZOOM_SUPPORTED, "false");
+    params.set(android::CameraParameters::KEY_ZOOM_RATIOS, "100");
+    params.set(android::CameraParameters::KEY_MAX_ZOOM, "10");
+    params.set(android::CameraParameters::KEY_ZOOM, "1");
+
+    /* Focus Areas Correction */
+    params.set(android::CameraParameters::KEY_FOCUS_AREAS, "0,0,0,0,0");
+
 #ifdef LOG_PARAMETERS
-    ALOGV("%s: Fixed parameters:", __FUNCTION__);
+    ALOGV("%s: ###Universal5433#### Fixed parameters:", __FUNCTION__);
     params.dump();
 #endif
 
